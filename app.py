@@ -120,7 +120,6 @@ if api_key :
         chain = prompt | llm
         response = chain.invoke({"difficulty": difficulty, "context": formatted_docs})
         response = response.additional_kwargs["function_call"]["arguments"]
-        st.write(response)
         return json.loads(response)["questions"]
 
 
@@ -167,6 +166,7 @@ if api_key :
 
         user_answers = []
         correct_count = 0
+        st.write(response["questions"])
         total_questions = len(response["questions"])
 
         with st.form("questions_form"):
