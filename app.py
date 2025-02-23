@@ -10,6 +10,14 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.schema import BaseOutputParser
 
+
+st.set_page_config(
+    page_title="QuizGPT",
+    page_icon="❓",
+)
+
+st.title("QuizGPT")
+
 function = {
     "name": "create_quiz",
     "description": "Generate a quiz based on difficulty and provided content",
@@ -72,12 +80,7 @@ class JsonOutputParser(BaseOutputParser):
 
 output_parser = JsonOutputParser()
 
-st.set_page_config(
-    page_title="QuizGPT",
-    page_icon="❓",
-)
 
-st.title("QuizGPT")
 
 difficulty = st.sidebar.selectbox(
     "Select Difficulty",
