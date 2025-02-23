@@ -118,7 +118,9 @@ if api_key :
         difficulty = difficulty.lower() if isinstance(difficulty, str) else "medium"
         prompt = PromptTemplate.from_template("Generate a {difficulty} level quiz based on the following content:\n\n{context}")
         chain = prompt | llm | output_parser
-        return chain.invoke({"difficulty": difficulty, "context": formatted_docs})
+        response = chain.invoke({"difficulty": difficulty, "context": formatted_docs})
+        response = response.additional_kwargs["function_call"]["arguments"]
+        return response
 
 
     @st.cache_data(show_spinner="Searching Wikipedia...")
