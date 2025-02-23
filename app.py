@@ -1,5 +1,6 @@
 import streamlit as st
 import json
+import os
 from langchain_community.retrievers import WikipediaRetriever
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.chat_models import ChatOllama
@@ -9,24 +10,27 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.schema import BaseOutputParser
 
-with st.sidebar:
-    openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
 
-if openai_api_key:
-    llm = ChatOpenAI(
-        openai_api_key=openai_api_key,
+if "openai_api_key" not in st.session_state:
+    st.session_state["openai_api_key"] = ""
+
+with st.sidebar:
+    openai_api_key = st.text_input("Enter OpenAI API Key", type="password")
+
+    if st.button("Save API Key"):
+        if openai_api_key:
+            st.session_state["openai_api_key"] = openai_api_key
+            os.environ["OPENAI_API_KEY"] = openai_api_key
+            st.success("API Key saved successfully!")
+        else:
+            st.error("Please enter a valid API Key.")
+
+api_key = os.getenv("OPENAI_API_KEY", st.session_state.get("openai_api_key", ""))
+llm = ChatOpenAI(openai_api_key=openai_api_key,
         model="gpt-3.5-turbo-1106",
         temperature=0.1,
         streaming=True,
-        callbacks=[StreamingStdOutCallbackHandler()]
-    ).bind(function_call="auto", functions=[function])
-else:
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo-1106",
-        temperature=0.1,
-        streaming=True,
-        callbacks=[StreamingStdOutCallbackHandler()]
-    ).bind(function_call="auto", functions=[function])
+        callbacks=[StreamingStdOutCallbackHandler()]).bind(function_call="auto", functions=[function])
 
 
 class JsonOutputParser(BaseOutputParser):
