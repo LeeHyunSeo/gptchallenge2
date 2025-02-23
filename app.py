@@ -80,15 +80,11 @@ class JsonOutputParser(BaseOutputParser):
 
 output_parser = JsonOutputParser()
 
-
-
 difficulty = st.sidebar.selectbox(
     "Select Difficulty",
     ["Easy", "Medium", "Hard"],
     index=1
 )
-
-
 
 def format_docs(docs):
     return "\n\n".join(document.page_content for document in docs)
@@ -113,8 +109,14 @@ def split_file(file):
 
 @st.cache_data(show_spinner="Making quiz...")
 def run_quiz_chain(_docs, topic, difficulty):
-    chain = {"context": _docs, "difficulty": difficulty.lower()} | formatting_chain
-    return chain.invoke(_docs)
+    if not _docs:
+        return {"questions": []}  
+    formatted_docs = "\n\n".join([doc.page_content for doc in _docs]) if isinstance(_docs, list) else _docs
+
+    difficulty = difficulty.lower() if isinstance(difficulty, str) else "medium"
+
+    chain = {"context": formatted_docs, "difficulty": difficulty} | formatting_chain
+    return chain.invoke({"context": formatted_docs, "difficulty": difficulty})
 
 @st.cache_data(show_spinner="Searching Wikipedia...")
 def wiki_search(term):
