@@ -10,6 +10,38 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.schema import BaseOutputParser
 
+function = {
+    "name": "create_quiz",
+    "description": "Generate a quiz based on difficulty and provided content",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "difficulty": {"type": "string", "description": "Quiz difficulty level (easy, medium, hard)"},
+            "questions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "question": {"type": "string"},
+                        "answers": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "answer": {"type": "string"},
+                                    "correct": {"type": "boolean"},
+                                },
+                                "required": ["answer", "correct"],
+                            },
+                        },
+                    },
+                    "required": ["question", "answers"],
+                },
+            }
+        },
+        "required": ["difficulty", "questions"],
+    },
+}
 
 if "openai_api_key" not in st.session_state:
     st.session_state["openai_api_key"] = ""
@@ -53,38 +85,7 @@ difficulty = st.sidebar.selectbox(
     index=1
 )
 
-function = {
-    "name": "create_quiz",
-    "description": "Generate a quiz based on difficulty and provided content",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "difficulty": {"type": "string", "description": "Quiz difficulty level (easy, medium, hard)"},
-            "questions": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "question": {"type": "string"},
-                        "answers": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "answer": {"type": "string"},
-                                    "correct": {"type": "boolean"},
-                                },
-                                "required": ["answer", "correct"],
-                            },
-                        },
-                    },
-                    "required": ["question", "answers"],
-                },
-            }
-        },
-        "required": ["difficulty", "questions"],
-    },
-}
+
 
 def format_docs(docs):
     return "\n\n".join(document.page_content for document in docs)
