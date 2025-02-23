@@ -119,8 +119,8 @@ if api_key :
         prompt = PromptTemplate.from_template("Generate a {difficulty} level quiz based on the following content:\n\n{context}")
         chain = prompt | llm | output_parser
         response = chain.invoke({"difficulty": difficulty, "context": formatted_docs})
-        response = response.additional_kwargs["function_call"]["arguments"]
         st.write(response)
+        response = response.additional_kwargs["function_call"]["arguments"]
         return response
 
 
