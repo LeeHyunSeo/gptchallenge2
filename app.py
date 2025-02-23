@@ -9,7 +9,7 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain.prompts import ChatPromptTemplate 
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.schema import BaseOutputParser
-from langchain.prompts import PromptTemplate
+from langchain.schema.runnable import RunnablePassthrough
 
 st.set_page_config(
     page_title="QuizGPT",
@@ -86,8 +86,6 @@ with st.sidebar:
         else:
             st.error("Please enter a valid API Key.")
 
-    file = st.file_uploader("Upload a .txt .pdf or  .docx file", type =["pdf", "docx", "txt"])
-
 api_key = os.getenv("OPENAI_API_KEY", st.session_state.get("openai_api_key", ""))
 
 if api_key :
@@ -112,10 +110,17 @@ if api_key :
         return docs
 
     @st.cache_data(show_spinner="Making quiz...")
-    def run_quiz_chain(_docs, topic):
-        prompt = PromptTemplate.from_template("Make a quiz about {city}")
-        chain = prompt | llm | output_parser
-        return chain.invoke(_docs)
+    def run_quiz_chain(_docs, topic, difficulty):
+        if not _docs:
+            return {"questions": []}  # 빈 데이터 방지
+
+        formatted_docs = "\n\n".join([doc.page_content for doc in _docs]) if isinstance(_docs, list) else _docs
+        difficulty = difficulty.lower() if isinstance(difficulty, str) else "medium"
+
+        input_runnable = RunnablePassthrough()
+        chain = input_runnable | llm | output_parser
+
+        return chain.invoke({"context": formatted_docs, "difficulty": difficulty})
 
 
     @st.cache_data(show_spinner="Searching Wikipedia...")
