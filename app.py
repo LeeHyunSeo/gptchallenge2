@@ -163,7 +163,7 @@ if api_key :
         )
     else:
         response = run_quiz_chain(docs, topic if topic else file.name, difficulty)
-
+        st.write(response)
         user_answers = []
         correct_count = 0
         st.write(response["questions"])
