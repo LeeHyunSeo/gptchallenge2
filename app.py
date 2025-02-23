@@ -121,7 +121,7 @@ if api_key :
         response = chain.invoke({"difficulty": difficulty, "context": formatted_docs})
         response = response.additional_kwargs["function_call"]["arguments"]
         st.write(response)
-        return response
+        return json.loads(response)["questions"]
 
 
     @st.cache_data(show_spinner="Searching Wikipedia...")
