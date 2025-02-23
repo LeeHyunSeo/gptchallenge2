@@ -120,6 +120,7 @@ if api_key :
         chain = prompt | llm | output_parser
         response = chain.invoke({"difficulty": difficulty, "context": formatted_docs})
         response = response.additional_kwargs["function_call"]["arguments"]
+        st.write(response)
         return response
 
 
