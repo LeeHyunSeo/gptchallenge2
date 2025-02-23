@@ -115,6 +115,7 @@ if api_key :
             return {"questions": []}
 
         formatted_docs = "\n\n".join([doc.page_content for doc in _docs]) if isinstance(_docs, list) else _docs
+        st.write(formatted_docs)
         difficulty = difficulty.lower() if isinstance(difficulty, str) else "medium"
         prompt = PromptTemplate.from_template("Generate a {difficulty} level quiz based on the following content:\n\n{context}")
         chain = prompt | llm | output_parser
