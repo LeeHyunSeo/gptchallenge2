@@ -18,15 +18,15 @@ st.set_page_config(
 
 st.title("QuizGPT")
 
-class JsonOutputParser(BaseOutputParser):
-    def parse(self, text):
-        text = text.replace("```", "").replace("json", "").strip()
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            return {"error": "Invalid JSON response", "raw": text}
+# class JsonOutputParser(BaseOutputParser):
+#     def parse(self, text):
+#         text = text.replace("```", "").replace("json", "").strip()
+#         try:
+#             return json.loads(text)
+#         except json.JSONDecodeError:
+#             return {"error": "Invalid JSON response", "raw": text}
 
-output_parser = JsonOutputParser()
+# output_parser = JsonOutputParser()
 
 if "openai_api_key" not in st.session_state:
     st.session_state["openai_api_key"] = ""
@@ -118,7 +118,7 @@ if api_key :
         st.write(formatted_docs)
         difficulty = difficulty.lower() if isinstance(difficulty, str) else "medium"
         prompt = PromptTemplate.from_template("Generate a {difficulty} level quiz based on the following content:\n\n{context}")
-        chain = prompt | llm | output_parser
+        chain = prompt | llm
         response = chain.invoke({"difficulty": difficulty, "context": formatted_docs})
         st.write(response)
         response = response.additional_kwargs["function_call"]["arguments"]
