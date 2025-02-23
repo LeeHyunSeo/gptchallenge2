@@ -163,14 +163,13 @@ if api_key :
         )
     else:
         response = run_quiz_chain(docs, topic if topic else file.name, difficulty)
-        st.write(response)
+
         user_answers = []
         correct_count = 0
-        st.write(response["questions"])
-        total_questions = len(response["questions"])
+        total_questions = len(response)
 
         with st.form("questions_form"):
-            for question in response["questions"]:
+            for question in response:
                 st.write(question["question"])
                 value = st.radio(
                     "Select an option.",
