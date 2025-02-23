@@ -9,7 +9,7 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain.prompts import ChatPromptTemplate 
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain.schema import BaseOutputParser
-from langchain.schema.runnable import RunnablePassthrough
+from langchain.prompts import PromptTemplate
 
 st.set_page_config(
     page_title="QuizGPT",
@@ -112,15 +112,13 @@ if api_key :
     @st.cache_data(show_spinner="Making quiz...")
     def run_quiz_chain(_docs, topic, difficulty):
         if not _docs:
-            return {"questions": []}  # 빈 데이터 방지
+            return {"questions": []}
 
         formatted_docs = "\n\n".join([doc.page_content for doc in _docs]) if isinstance(_docs, list) else _docs
         difficulty = difficulty.lower() if isinstance(difficulty, str) else "medium"
-
-        input_runnable = RunnablePassthrough()
-        chain = input_runnable | llm | output_parser
-
-        return chain.invoke({"context": formatted_docs, "difficulty": difficulty})
+        prompt = PromptTemplate.from_template("Generate a {difficulty} level quiz based on the following content:\n\n{context}")
+        chain = prompt | llm | output_parser
+        return chain.invoke({"difficulty": difficulty, "context": formatted_docs})
 
 
     @st.cache_data(show_spinner="Searching Wikipedia...")
